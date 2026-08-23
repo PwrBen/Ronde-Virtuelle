@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ronde de Sécurité - Inspection Extérieure</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="consignes">
+        <h1>Ronde de sécurité : Inspection des abords</h1>
+        <p>Inspectez le périmètre. Cliquez sur les anomalies pour déterminer l'action à mener.</p>
+        <p>Anomalies traitées : <span id="score">0</span> / 3</p>
+    </header>
+
+    <main id="scene-ronde">
+        <!-- Remplacez par votre image finale (sans la grille pour les apprenants) -->
+        <img src="site-securite.jpg" alt="Abords du site" id="image-fond">
+        
+        <!-- BLOC 1 : Issue de secours mal verrouillée (Approximativement C7-E8) -->
+        <div class="anomalie" id="bloc1" data-id="bloc1" style="top: 40%; left: 65%; width: 12%; height: 35%;" title="Cliquer pour inspecter"></div>
+        
+        <!-- BLOC 2 : Grillage découpé (Approximativement C2-D4) -->
+        <div class="anomalie" id="bloc2" data-id="bloc2" style="top: 45%; left: 16%; width: 15%; height: 25%;" title="Cliquer pour inspecter"></div>
+        
+        <!-- BLOC 3 : Poubelle sous la fenêtre (Cases C5, C6, D5, D6) -->
+        <div class="anomalie" id="bloc3" data-id="bloc3" style="top: 50%; left: 41%; width: 15%; height: 25%;" title="Cliquer pour inspecter"></div>
+    </main>
+
+    <!-- Fenêtre Modale pour le QCM -->
+    <div id="qcm-modal" class="modal cache">
+        <div class="modal-contenu">
+            <h2 id="qcm-titre">Question</h2>
+            <div id="qcm-options" class="options-container">
+                <!-- Les boutons seront générés en JS -->
+            </div>
+            <p id="qcm-feedback" class="feedback cache"></p>
+            <button id="btn-fermer" class="cache">Fermer et continuer</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

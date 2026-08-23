@@ -10,15 +10,12 @@
 
     <header class="consignes">
         <h1>Ronde de sécurité : Inspection des abords</h1>
-        <p>Inspectez le périmètre. Cliquez sur les anomalies pour déterminer l'action à mener.</p>
+        <p>Inspectez le périmètre. Cliquez sur les anomalies pour formuler votre constat.</p>
         <p>Anomalies traitées : <span id="score">0</span> / 3</p>
-        
-        <!-- Bouton pour afficher/masquer les zones -->
         <button id="btn-toggle-zones">Afficher/Masquer les zones d'aide</button>
     </header>
 
     <main id="scene-ronde">
-        <!-- Image de fond -->
         <img src="site-securite.jpg" alt="Abords du site" id="image-fond">
         
         <!-- BLOC 1 : Issue de secours mal verrouillée -->
@@ -31,15 +28,31 @@
         <div class="anomalie" id="bloc3" data-id="bloc3" style="top: 50%; left: 41%; width: 15%; height: 25%;" title="Cliquer pour inspecter"></div>
     </main>
 
-    <!-- Fenêtre Modale pour le QCM -->
+    <!-- Fenêtre Modale pour le QCM double -->
     <div id="qcm-modal" class="modal cache">
-        <div class="modal-contenu">
-            <h2 id="qcm-titre">Question</h2>
-            <div id="qcm-options" class="options-container">
-                <!-- Les boutons seront générés en JS -->
+        <div class="modal-contenu double-colonne-layout">
+            <span id="fermer-croix" title="Fermer la fenêtre">&times;</span>
+            <h2 id="qcm-titre">Analyse de la situation</h2>
+            
+            <div class="grille-qcm">
+                <!-- Colonne 1 : Le Constat -->
+                <div class="colonne-qcm">
+                    <h3>1. Identification (Constat factuel)</h3>
+                    <div id="options-id" class="options-container"></div>
+                </div>
+                
+                <!-- Colonne 2 : L'Analyse -->
+                <div class="colonne-qcm">
+                    <h3>2. Justification (Évaluation du risque)</h3>
+                    <div id="options-justif" class="options-container"></div>
+                </div>
             </div>
-            <p id="qcm-feedback" class="feedback cache"></p>
-            <button id="btn-fermer" class="cache">Fermer et continuer</button>
+
+            <div class="actions-modal">
+                <button id="btn-valider-analyse" class="cache" disabled>Valider mon analyse</button>
+                <p id="qcm-feedback" class="feedback cache"></p>
+                <button id="btn-fermer" class="cache">Continuer la ronde</button>
+            </div>
         </div>
     </div>
 

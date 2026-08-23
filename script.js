@@ -1,46 +1,63 @@
-// Base de données des anomalies et QCM
+// Base de données : Constat factuel (Id) + Évaluation du risque (Justification)
 const qcmData = {
-    "bloc1": { // Issue de secours mal verrouillée
-        question: "L'issue de secours du bâtiment est entrouverte. Quelle est la bonne procédure ?",
-        options: [
-            { texte: "Je referme et verrouille la porte, puis j'alerte le PC Sécurité pour une levée de doute à l'intérieur.", correct: true },
-            { texte: "Je rentre seul à l'intérieur pour inspecter le bâtiment.", correct: false },
-            { texte: "Je continue ma ronde extérieure, l'intérieur ne me concerne pas.", correct: false }
+    "bloc1": {
+        titre: "Zone : Issue de secours",
+        id: [
+            { texte: "La porte coupe-feu est endommagée", correct: false },
+            { texte: "L'issue de secours est laissée entrouverte", correct: true },
+            { texte: "La serrure de la porte a été fracturée", correct: false }
         ],
-        explication: "L'entrebâillement d'une issue peut être une préparation au vol ou à l'intrusion. Il faut sécuriser l'accès et déclencher une vérification."
+        justif: [
+            { texte: "Cela bloque l'évacuation du public en cas d'incendie majeur.", correct: false },
+            { texte: "Cela provoque une déperdition thermique et ne respecte pas les normes écologiques.", correct: false },
+            { texte: "Cela facilite une intrusion extérieure et constitue une faille volontaire ou involontaire de la sûreté.", correct: true }
+        ],
+        explication: "Une issue entrouverte est souvent une technique de préparation au vol. Il faut sécuriser l'accès et déclencher une vérification ou une levée de doute."
     },
-    "bloc2": { // Grillage découpé
-        question: "Vous constatez un trou découpé dans le grillage d'enceinte. Que devez-vous faire ?",
-        options: [
-            { texte: "Je répare le grillage moi-même avec du fil de fer.", correct: false },
-            { texte: "Je passe à travers pour voir ce qu'il y a de l'autre côté.", correct: false },
-            { texte: "J'alerte le PC Sécurité immédiatement, je fige les lieux et je reste en observation en attendant du renfort.", correct: true }
+    "bloc2": {
+        titre: "Zone : Périmètre extérieur",
+        id: [
+            { texte: "Le grillage d'enceinte a été découpé", correct: true },
+            { texte: "Le poteau de clôture est oxydé et fragilisé", correct: false },
+            { texte: "Un objet suspect est accroché au grillage", correct: false }
         ],
-        explication: "Un grillage découpé est une effraction avérée. Il faut prévenir, sécuriser la zone pour ne pas détruire d'éventuelles traces et attendre les consignes."
+        justif: [
+            { texte: "C'est un risque d'accident pour le personnel d'entretien des espaces verts.", correct: false },
+            { texte: "C'est une effraction caractérisée qui prouve qu'une intrusion a eu lieu ou est en cours.", correct: true },
+            { texte: "Cela nécessite uniquement un rapport pour l'équipe de maintenance technique.", correct: false }
+        ],
+        explication: "Un grillage découpé nécessite d'alerter immédiatement le PC, de figer les lieux pour préserver les traces, et d'attendre des renforts."
     },
-    "bloc3": { // Poubelle placée sous la fenêtre
-        question: "Vous remarquez une poubelle positionnée sous une fenêtre du rez-de-chaussée. Que faites-vous ?",
-        options: [
-            { texte: "Je la laisse ici, c'est le travail des agents d'entretien.", correct: false },
-            { texte: "Je la déplace loin de la façade pour éviter l'escalade et le risque incendie, et je le signale sur ma main courante.", correct: true },
-            { texte: "Je regarde ce qu'il y a à l'intérieur pour chercher des indices.", correct: false }
+    "bloc3": {
+        titre: "Zone : Façade du bâtiment",
+        id: [
+            { texte: "Des détritus jonchent le sol près de la porte", correct: false },
+            { texte: "Une poubelle a été volontairement placée sous une fenêtre", correct: true },
+            { texte: "Le conteneur obstrue la voie de circulation des véhicules", correct: false }
         ],
-        explication: "Une poubelle sous une fenêtre est un 'marchepied' facilitant l'intrusion et un danger en cas d'incendie (propagation à la façade)."
+        justif: [
+            { texte: "Cela sert de « marchepied » facilitant l'intrusion par la fenêtre et crée un risque de propagation d'incendie.", correct: true },
+            { texte: "Cela attire les nuisibles à proximité immédiate des zones de stockage alimentaire.", correct: false },
+            { texte: "Cela empêche le ramassage par les services de la voirie.", correct: false }
+        ],
+        explication: "Tout objet sous une ouverture facilite l'escalade. Il faut l'éloigner de la façade et rédiger une main courante (rapport factuel)."
     }
 };
 
 let score = 0;
 let anomalieEnCours = null;
+let selectionId = null;
+let selectionJustif = null;
 
-// Éléments du DOM
 const modal = document.getElementById('qcm-modal');
 const titreQcm = document.getElementById('qcm-titre');
-const optionsContainer = document.getElementById('qcm-options');
+const conteneurId = document.getElementById('options-id');
+const conteneurJustif = document.getElementById('options-justif');
+const btnValider = document.getElementById('btn-valider-analyse');
 const feedback = document.getElementById('qcm-feedback');
 const btnFermer = document.getElementById('btn-fermer');
 const affichageScore = document.getElementById('score');
 
-// Ajouter le clic sur chaque anomalie
 document.querySelectorAll('.anomalie').forEach(zone => {
     zone.addEventListener('click', function() {
         anomalieEnCours = this;
@@ -50,76 +67,116 @@ document.querySelectorAll('.anomalie').forEach(zone => {
 
 function ouvrirQCM(idAnomalie) {
     const data = qcmData[idAnomalie];
-    titreQcm.textContent = data.question;
-    optionsContainer.innerHTML = '';
+    titreQcm.textContent = data.titre;
+    
+    // Réinitialiser la modale
+    selectionId = null;
+    selectionJustif = null;
+    conteneurId.innerHTML = '';
+    conteneurJustif.innerHTML = '';
     feedback.classList.add('cache');
     btnFermer.classList.add('cache');
+    btnValider.classList.remove('cache');
+    btnValider.disabled = true;
 
-    // Générer les boutons de réponses
-    data.options.forEach(opt => {
+    // Générer la colonne 1 (Identification)
+    data.id.forEach((opt, index) => {
         const btn = document.createElement('button');
         btn.classList.add('btn-option');
         btn.textContent = opt.texte;
-        btn.onclick = () => verifierReponse(btn, opt.correct, data.explication);
-        optionsContainer.appendChild(btn);
+        btn.dataset.correct = opt.correct;
+        btn.onclick = () => {
+            selectionId = selectionnerOption(conteneurId, btn);
+            verifierBoutonValidation();
+        };
+        conteneurId.appendChild(btn);
+    });
+
+    // Générer la colonne 2 (Justification)
+    data.justif.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.classList.add('btn-option');
+        btn.textContent = opt.texte;
+        btn.dataset.correct = opt.correct;
+        btn.onclick = () => {
+            selectionJustif = selectionnerOption(conteneurJustif, btn);
+            verifierBoutonValidation();
+        };
+        conteneurJustif.appendChild(btn);
     });
 
     modal.classList.remove('cache');
 }
 
-function verifierReponse(bouton, estCorrect, explication) {
-    // Désactiver tous les boutons après le clic
-    document.querySelectorAll('.btn-option').forEach(b => b.disabled = true);
+// Gère le style visuel de la sélection exclusive dans une colonne
+function selectionnerOption(conteneur, boutonClique) {
+    // Retirer la classe 'selectionne' de tous les boutons de cette colonne
+    conteneur.querySelectorAll('.btn-option').forEach(b => b.classList.remove('selectionne'));
+    // Ajouter la classe au bouton cliqué
+    boutonClique.classList.add('selectionne');
+    return boutonClique; // Retourne l'élément cliqué
+}
 
+// Active le bouton valider si les deux colonnes ont une sélection
+function verifierBoutonValidation() {
+    if (selectionId !== null && selectionJustif !== null) {
+        btnValider.disabled = false;
+    }
+}
+
+// Action au clic sur "Valider mon analyse"
+btnValider.addEventListener('click', () => {
+    const data = qcmData[anomalieEnCours.dataset.id];
+    const idEstCorrect = selectionId.dataset.correct === "true";
+    const justifEstCorrect = selectionJustif.dataset.correct === "true";
+
+    // Désactiver tous les boutons pour empêcher de modifier la réponse
+    document.querySelectorAll('.btn-option').forEach(b => b.disabled = true);
+    btnValider.classList.add('cache');
     feedback.classList.remove('cache');
 
-    if (estCorrect) {
-        bouton.classList.add('correct');
-        feedback.textContent = "Bonne réponse ! " + explication;
+    // Vérification du résultat
+    if (idEstCorrect && justifEstCorrect) {
+        selectionId.classList.add('correct');
+        selectionJustif.classList.add('correct');
+        feedback.textContent = "Excellente analyse ! " + data.explication;
         feedback.style.color = "#2ecc71";
         
-        // Valider l'anomalie si elle n'a pas déjà été traitée
         if (!anomalieEnCours.classList.contains('traitee')) {
             anomalieEnCours.classList.add('traitee');
-            anomalieEnCours.classList.remove('visible'); // On retire la classe d'aide si elle était active
+            anomalieEnCours.classList.remove('visible');
             score++;
             affichageScore.textContent = score;
         }
 
-        // Fin de l'exercice
         if (score === 3) {
-            setTimeout(() => alert("Félicitations, ronde terminée avec succès ! Vous maîtrisez les procédures."), 1000);
+            setTimeout(() => alert("Mission accomplie : périmètre sécurisé et rapports factuels validés."), 1000);
         }
     } else {
-        bouton.classList.add('erreur');
-        feedback.textContent = "Mauvaise réponse. " + explication;
+        // Affichage des erreurs
+        if (!idEstCorrect) selectionId.classList.add('erreur');
+        if (!justifEstCorrect) selectionJustif.classList.add('erreur');
+        feedback.innerHTML = "Analyse incorrecte ou incomplète.<br>" + data.explication;
         feedback.style.color = "#e74c3c";
     }
 
     btnFermer.classList.remove('cache');
-}
-
-// Fermer la modale
-btnFermer.addEventListener('click', () => {
-    modal.classList.add('cache');
 });
 
-// --- GESTION DU BOUTON D'AIDE (Afficher/Masquer les zones) ---
+// Fermetures de la modale
+btnFermer.addEventListener('click', () => modal.classList.add('cache'));
+document.getElementById('fermer-croix').addEventListener('click', () => modal.classList.add('cache'));
+
+// Gestion du bouton d'aide
 const btnToggleZones = document.getElementById('btn-toggle-zones');
 const anomalies = document.querySelectorAll('.anomalie');
-let zonesAffichees = false; // On mémorise l'état actuel
+let zonesAffichees = false;
 
 btnToggleZones.addEventListener('click', () => {
-    zonesAffichees = !zonesAffichees; // On inverse l'état (vrai/faux)
-    
+    zonesAffichees = !zonesAffichees;
     anomalies.forEach(zone => {
-        // Si la zone n'a pas encore été traitée (pas verte)
         if (!zone.classList.contains('traitee')) {
-            if (zonesAffichees) {
-                zone.classList.add('visible'); // On allume
-            } else {
-                zone.classList.remove('visible'); // On éteint
-            }
+            zonesAffichees ? zone.classList.add('visible') : zone.classList.remove('visible');
         }
     });
 });

@@ -107,12 +107,19 @@ btnFermer.addEventListener('click', () => {
 // --- GESTION DU BOUTON D'AIDE (Afficher/Masquer les zones) ---
 const btnToggleZones = document.getElementById('btn-toggle-zones');
 const anomalies = document.querySelectorAll('.anomalie');
+let zonesAffichees = false; // On mémorise l'état actuel
 
 btnToggleZones.addEventListener('click', () => {
+    zonesAffichees = !zonesAffichees; // On inverse l'état (vrai/faux)
+    
     anomalies.forEach(zone => {
-        // On ne bascule l'affichage que si la zone n'a pas encore été trouvée/validée
+        // Si la zone n'a pas encore été traitée (pas verte)
         if (!zone.classList.contains('traitee')) {
-            zone.classList.toggle('visible');
+            if (zonesAffichees) {
+                zone.classList.add('visible'); // On allume
+            } else {
+                zone.classList.remove('visible'); // On éteint
+            }
         }
     });
 });
